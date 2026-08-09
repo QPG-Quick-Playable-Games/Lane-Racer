@@ -8,6 +8,7 @@ const gameOverPanel = document.getElementById('game-over-panel');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const boostMeter = document.getElementById('boost-meter');
+const boostButton = document.querySelector('[data-boost]');
 
 const road = { left: 86, right: 394, laneWidth: 102 };
 const player = { x: 240, y: 604, width: 38, height: 70, speed: 6 };
@@ -69,5 +70,15 @@ function setKey(direction, pressed) { keys[direction] = pressed; }
 
 window.addEventListener('keydown', event => { if (['ArrowLeft', 'a', 'A'].includes(event.key)) { event.preventDefault(); setKey('left', true); } if (['ArrowRight', 'd', 'D'].includes(event.key)) { event.preventDefault(); setKey('right', true); } if (event.code === 'Space') { event.preventDefault(); boostHeld = true; } if (event.key === 'Enter' && !running) startGame(); });
 window.addEventListener('keyup', event => { if (['ArrowLeft', 'a', 'A'].includes(event.key)) setKey('left', false); if (['ArrowRight', 'd', 'D'].includes(event.key)) setKey('right', false); if (event.code === 'Space') boostHeld = false; });
-document.querySelectorAll('[data-direction]').forEach(button => { const direction = button.dataset.direction; button.addEventListener('pointerdown', () => setKey(direction, true)); button.addEventListener('pointerup', () => setKey(direction, false)); button.addEventListener('pointerleave', () => setKey(direction, false)); });
+document.querySelectorAll('[data-direction]').forEach(button => {
+  const direction = button.dataset.direction;
+  button.addEventListener('pointerdown', event => { event.preventDefault(); button.setPointerCapture(event.pointerId); setKey(direction, true); });
+  button.addEventListener('pointerup', () => setKey(direction, false));
+  button.addEventListener('pointercancel', () => setKey(direction, false));
+  button.addEventListener('lostpointercapture', () => setKey(direction, false));
+});
+boostButton.addEventListener('pointerdown', event => { event.preventDefault(); boostButton.setPointerCapture(event.pointerId); boostHeld = true; });
+boostButton.addEventListener('pointerup', () => { boostHeld = false; });
+boostButton.addEventListener('pointercancel', () => { boostHeld = false; });
+boostButton.addEventListener('lostpointercapture', () => { boostHeld = false; });
 startButton.addEventListener('click', startGame); restartButton.addEventListener('click', startGame); render();
