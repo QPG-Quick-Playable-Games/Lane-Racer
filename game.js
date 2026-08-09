@@ -29,10 +29,10 @@ function resetGame() { traffic = []; score = 0; roadOffset = 0; spawnTimer = 0; 
 function startGame() { resetGame(); running = true; startPanel.classList.add('hidden'); gameOverPanel.classList.add('hidden'); lastTime = performance.now(); requestAnimationFrame(loop); }
 function endGame() { running = false; best = Math.max(best, score); localStorage.setItem('neon-apex-best', best); bestElement.textContent = formatScore(best); finalScoreElement.textContent = formatScore(score); gameOverPanel.classList.remove('hidden'); }
 function spawnCar() {
-  const playerLane = Math.max(0, Math.min(2, Math.round((player.x - road.left - road.laneWidth / 2) / road.laneWidth)));
-  const lane = playerLane;
   const colors = ['#ff6b54', '#57c6d4', '#d6f54a', '#d88cff'];
-  traffic.push({ x: road.left + road.laneWidth / 2 + lane * road.laneWidth, y: -80, width: 38, height: 70, speed: 2.5 + Math.random() * 1.4 + score / 1300, color: colors[Math.floor(Math.random() * colors.length)] });
+  const minX = road.left + 26;
+  const maxX = road.right - 26;
+  traffic.push({ x: minX + Math.random() * (maxX - minX), y: -80, width: 38, height: 70, speed: 2.5 + Math.random() * 1.4 + score / 1300, color: colors[Math.floor(Math.random() * colors.length)] });
 }
 function drawRoad() {
   ctx.fillStyle = '#1d2c31'; ctx.fillRect(0, 0, canvas.width, canvas.height);
