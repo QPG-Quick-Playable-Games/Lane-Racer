@@ -22,16 +22,19 @@ let lastTime = 0;
 let boost = 100;
 const keys = { left: false, right: false };
 let boostHeld = false;
+let trafficCount = 0;
 bestElement.textContent = formatScore(best);
 
 function formatScore(value) { return String(Math.floor(value)).padStart(6, '0'); }
-function resetGame() { traffic = []; score = 0; roadOffset = 0; spawnTimer = 0; boost = 100; player.x = 240; scoreElement.textContent = formatScore(score); boostMeter.style.transform = 'scaleX(1)'; }
+function resetGame() { traffic = []; trafficCount = 0; score = 0; roadOffset = 0; spawnTimer = 0; boost = 100; player.x = 240; scoreElement.textContent = formatScore(score); boostMeter.style.transform = 'scaleX(1)'; }
 function startGame() { resetGame(); running = true; startPanel.classList.add('hidden'); gameOverPanel.classList.add('hidden'); lastTime = performance.now(); requestAnimationFrame(loop); }
 function endGame() { running = false; best = Math.max(best, score); localStorage.setItem('neon-apex-best', best); bestElement.textContent = formatScore(best); finalScoreElement.textContent = formatScore(score); gameOverPanel.classList.remove('hidden'); }
 function spawnCar() {
-  const lane = Math.floor(Math.random() * 3);
+  const playerLane = Math.max(0, Math.min(2, Math.round((player.x - road.left - road.laneWidth / 2) / road.laneWidth)));
+  const lane = trafficCount % 3 === 2 || Math.random() < 0.45 ? playerLane : Math.floor(Math.random() * 3);
   const colors = ['#ff6b54', '#57c6d4', '#d6f54a', '#d88cff'];
   traffic.push({ x: road.left + road.laneWidth / 2 + lane * road.laneWidth, y: -80, width: 38, height: 70, speed: 2.5 + Math.random() * 1.4 + score / 1300, color: colors[Math.floor(Math.random() * colors.length)] });
+  trafficCount += 1;
 }
 function drawRoad() {
   ctx.fillStyle = '#1d2c31'; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -59,7 +62,7 @@ function update(delta) {
   if (keys.left) player.x -= movement; if (keys.right) player.x += movement;
   player.x = Math.max(road.left + player.width / 2 + 7, Math.min(road.right - player.width / 2 - 7, player.x));
   const pace = 4.4 + score / 900 + (boosting ? 5 : 0); roadOffset = (roadOffset + pace * delta * 0.06) % 66;
-  boost += (boosting ? -0.055 : 0.025) * delta; boost = Math.max(0, Math.min(100, boost)); boostMeter.style.transform = `scaleX(${boost / 100})`;
+  boost += (boosting ? -0.12 : 0.018) * delta; boost = Math.max(0, Math.min(100, boost)); boostMeter.style.transform = `scaleX(${boost / 100})`;
   spawnTimer += delta; if (spawnTimer > Math.max(530, 920 - score * 2)) { spawnCar(); spawnTimer = 0; }
   traffic.forEach(car => { car.y += (pace + car.speed) * delta * 0.06; if (overlaps(player, car)) endGame(); });
   traffic = traffic.filter(car => car.y < canvas.height + 100); score += delta * 0.012; scoreElement.textContent = formatScore(score);
