@@ -1,4 +1,4 @@
-# Neon Apex
+# Lane Racing Game
 
 A small 2D endless racing game built with vanilla HTML, CSS, and JavaScript. Dodge traffic, survive as long as possible, and beat your best score.
 
