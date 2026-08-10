@@ -30,9 +30,10 @@ function startGame() { resetGame(); running = true; startPanel.classList.add('hi
 function endGame() { running = false; best = Math.max(best, score); localStorage.setItem('neon-apex-best', best); bestElement.textContent = formatScore(best); finalScoreElement.textContent = formatScore(score); gameOverPanel.classList.remove('hidden'); }
 function spawnCar() {
   const colors = ['#ff6b54', '#57c6d4', '#d6f54a', '#d88cff'];
-  const minX = road.left + 26;
-  const maxX = road.right - 26;
-  traffic.push({ x: minX + Math.random() * (maxX - minX), y: -80, width: 38, height: 70, speed: 2.5 + Math.random() * 1.4 + score / 1300, color: colors[Math.floor(Math.random() * colors.length)] });
+  const lane = Math.floor(Math.random() * 3);
+  const laneCenter = road.left + road.laneWidth / 2 + lane * road.laneWidth;
+  const x = Math.random() < 0.5 ? laneCenter : laneCenter + (Math.random() * 2 - 1) * road.laneWidth * 0.42;
+  traffic.push({ x, y: -80, width: 38, height: 70, speed: 2.5 + Math.random() * 1.4 + score / 1300, color: colors[Math.floor(Math.random() * colors.length)] });
 }
 function drawRoad() {
   ctx.fillStyle = '#1d2c31'; ctx.fillRect(0, 0, canvas.width, canvas.height);
